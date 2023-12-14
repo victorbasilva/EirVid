@@ -18,6 +18,7 @@ public class AccessH2 {
 
     public void createTables() {
         
+        // Creating all tables in the H2 database in memory
         ConnectToDataBase connectToDataBase = new ConnectToDataBase();
         Connection connection = connectToDataBase.getConnection();
         
@@ -25,9 +26,14 @@ public class AccessH2 {
         try (connection) {
             connection.setAutoCommit(false);
             stmt = connection.createStatement();
-            stmt.execute("CREATE TABLE IF NOT EXISTS UserEirVid(id int primary key, email varchar(200), name varchar(150), password varchar(50))");
-            stmt.execute("INSERT INTO UserEirVid(id, email, name, password) VALUES(1, 'angelita@gmail.com', 'Angelita', '123456')");
+            // Create a UserEirVid table 
+            stmt.execute("CREATE TABLE IF NOT EXISTS USEREIRVID(id IDENTITY NOT NULL PRIMARY KEY, emailUser VARCHAR(200), nameUser VARCHAR(150), passwordUser VARCHAR(50))");
+            stmt.execute("INSERT INTO USEREIRVID(emailUser, nameUser, passwordUser) VALUES('angelita@gmail.com', 'Angelita', '123456')");
 
+            // Create a Movie table 
+            stmt.execute("CREATE TABLE IF NOT EXISTS MOVIE(id IDENTITY NOT NULL PRIMARY KEY, nameMovie VARCHAR(200), categoryMovie VARCHAR(150), yearMovie VARCHAR(4), price VARCHAR(6))");
+
+            
             stmt.close();
             connection.commit();
             System.out.println("Databases Created");
@@ -40,6 +46,7 @@ public class AccessH2 {
         }
     }
     
+    // Method to create a table
     public void createTable(String sql) {
                 
         ConnectToDataBase connectToDataBase = new ConnectToDataBase();
@@ -60,8 +67,52 @@ public class AccessH2 {
             connectToDataBase.closeConnection(connection, createPreparedStatement, null);
         }
     }
+    
+    // Insert a new user in the system
+    public void insertNewUserSql(String nameUser, String emailUser, String passwordUser, String insertNewUserSql) {
+                
+        ConnectToDataBase connectToDataBase = new ConnectToDataBase();
+        Connection connection = connectToDataBase.getConnection();
 
-    public void insertWithStatement(String sql) {
+        PreparedStatement pstm = null;
+        try {
+            pstm = connection.prepareStatement(insertNewUserSql);
+            pstm.setString(1, nameUser);
+            pstm.setString(2, emailUser);
+            pstm.setString(3, passwordUser);
+
+            pstm.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+             connectToDataBase.closeConnection(connection, null, null);
+        }
+    }
+    
+    // Insert a user after created the table MOVIE
+    public void insertSql(String nameMovie, String categoryMovie, String yearMovie, String price, String insertSqlMovie) {
+                
+        ConnectToDataBase connectToDataBase = new ConnectToDataBase();
+        Connection connection = connectToDataBase.getConnection();
+
+        PreparedStatement pstm = null;
+        try {
+            pstm = connection.prepareStatement(insertSqlMovie);
+            pstm.setString(1, nameMovie);
+            pstm.setString(2, categoryMovie);
+            pstm.setString(3, yearMovie);
+            pstm.setString(4, price);
+
+            pstm.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+             connectToDataBase.closeConnection(connection, null, null);
+        }
+    }
+    
+    // Insert using sqj value
+    public void insertSqlWithoutPreparedStatement(String sql) {
                 
         ConnectToDataBase connectToDataBase = new ConnectToDataBase();
         Connection connection = connectToDataBase.getConnection();
@@ -71,13 +122,7 @@ public class AccessH2 {
         try (connection) {
             connection.setAutoCommit(false);
             stmt = connection.createStatement();
-            stmt.execute(sql);
-
-            rs = stmt.executeQuery("select * from USER");
-            System.out.println("H2 In-Memory Database inserted through Statement");
-//            while (rs.next()) {
-//                System.out.println("Id " + rs.getInt("id") + " Name " + rs.getString("name"));
-//            }
+            stmt.executeUpdate(sql);
             stmt.close();
             connection.commit();
             System.out.println("Database Inserted");
@@ -89,7 +134,8 @@ public class AccessH2 {
             connectToDataBase.closeConnection(connection, null, rs);
         }
     }
-
+    
+    // Update using sql value
     public void updateWithPreparedStatement(String sql) {
                 
         ConnectToDataBase connectToDataBase = new ConnectToDataBase();
@@ -116,7 +162,44 @@ public class AccessH2 {
         }
     }
 
-    public boolean SelectUser(String sqlUser, String email, String password) {
+    // Get the data of Movie using an id
+    public Movie findMovieById(Long idMovie) {
+                
+        ConnectToDataBase connectToDataBase = new ConnectToDataBase();
+        Connection connection = connectToDataBase.getConnection();
+        
+        PreparedStatement selectPreparedStatement = null;
+
+        Movie movie = new Movie();
+        ResultSet rs = null;
+        String SelectQuery = "SELECT * FROM MOVIE WHERE ID = ?";
+
+        try (connection) {
+            connection.setAutoCommit(false);
+
+            selectPreparedStatement = connection.prepareStatement(SelectQuery);
+            selectPreparedStatement.setLong(1, idMovie);
+            
+            rs = selectPreparedStatement.executeQuery();
+            while (rs.next()) {
+                movie.setId(rs.getLong("id"));
+                movie.setNameMovie(rs.getString("nameMovie"));
+                movie.setCategoryMovie(rs.getString("categoryMovie"));
+                movie.setYearMovie(rs.getString("yearMovie"));
+                movie.setPrice(rs.getString("price"));
+            } 
+        } catch (SQLException e) {
+            System.out.println("Exception Message " + e.getLocalizedMessage());
+        } catch (Exception e) {
+        } finally {
+            System.out.println("Database Selected");
+            connectToDataBase.closeConnection(connection, selectPreparedStatement, rs);
+            return movie;
+        }
+    }    
+    
+    // Found a user in a database
+    public UserEirVid findUserById(Long idUser) {
                 
         ConnectToDataBase connectToDataBase = new ConnectToDataBase();
         Connection connection = connectToDataBase.getConnection();
@@ -124,9 +207,45 @@ public class AccessH2 {
         PreparedStatement selectPreparedStatement = null;
 
         UserEirVid user = new UserEirVid();
+        ResultSet rs = null;
+        String SelectQuery = "SELECT * FROM USEREIRVID WHERE ID = ?";
+
+        try (connection) {
+            connection.setAutoCommit(false);
+
+            selectPreparedStatement = connection.prepareStatement(SelectQuery);
+            selectPreparedStatement.setLong(1, idUser);
+            
+            rs = selectPreparedStatement.executeQuery();
+            while (rs.next()) {
+                user.setId(rs.getLong("id"));
+                user.setEmailUser(rs.getString("emailUser"));
+                user.setNameUser(rs.getString("nameUser"));
+                user.setPasswordUser(rs.getString("passwordUser"));
+            } 
+        } catch (SQLException e) {
+            System.out.println("Exception Message " + e.getLocalizedMessage());
+        } catch (Exception e) {
+        } finally {
+            System.out.println("Database Selected");
+            connectToDataBase.closeConnection(connection, selectPreparedStatement, rs);
+            return user;
+        }
+    }
+    
+    // Verify if the user exist in a database
+    public boolean checkIfUserExists(String email, String password) {
+                
+        ConnectToDataBase connectToDataBase = new ConnectToDataBase();
+        Connection connection = connectToDataBase.getConnection();
+        
+        PreparedStatement selectPreparedStatement = null;
+
+//        UserEirVid user = new UserEirVid();
         boolean userFound = false;
         ResultSet rs = null;
-        String SelectQuery = sqlUser;
+//        String sql = "SELECT * FROM UserEirVid WHERE EMAIL = ? AND PASSWORD = ?";
+        String SelectQuery = "SELECT * FROM USEREIRVID WHERE EMAILUSER = ? AND PASSWORDUSER = ?";
 
         try (connection) {
             connection.setAutoCommit(false);
@@ -136,20 +255,16 @@ public class AccessH2 {
             selectPreparedStatement.setString(2, password);
             
             rs = selectPreparedStatement.executeQuery();
-            while (rs.next()) {
-                user.setEmail(rs.getString("email"));
-                user.setName(rs.getString("name"));
-                user.setPassword(rs.getString("password"));
+            if(rs.next()) {
                 userFound = true;
-            } 
-//            connection.commit();
+            }
         } catch (SQLException e) {
             System.out.println("Exception Message " + e.getLocalizedMessage());
         } catch (Exception e) {
         } finally {
             System.out.println("Database Selected");
             connectToDataBase.closeConnection(connection, selectPreparedStatement, rs);
+            return userFound;
         }
-        return userFound;
     }
 }
