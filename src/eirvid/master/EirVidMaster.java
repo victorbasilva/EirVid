@@ -1,7 +1,9 @@
 package eirvid.master;
 
 import eirvid.master.connectdatabase.AccessH2;
+import eirvid.master.model.Movie;
 import eirvid.master.model.UserEirVid;
+import eirvid.master.model.dto.RentDto;
 import eirvid.master.resource.ReadCSVFile;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

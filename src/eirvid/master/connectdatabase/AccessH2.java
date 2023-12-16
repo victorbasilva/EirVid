@@ -3,6 +3,7 @@ package eirvid.master.connectdatabase;
 import eirvid.master.model.Movie;
 import eirvid.master.model.Rent;
 import eirvid.master.model.UserEirVid;
+import eirvid.master.model.dto.RentDto;
 import java.sql.Statement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
