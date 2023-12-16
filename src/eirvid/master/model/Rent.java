@@ -12,7 +12,7 @@ public class Rent {
 
     private Long id;
     private String name;
-    private Movies movie;
+    private Movie movie;
     private LocalDateTime date;
 
     public String getNome() {
@@ -23,11 +23,11 @@ public class Rent {
         this.name = name;
     }
 
-    public Movies getMovie() {
+    public Movie getMovie() {
         return movie;
     }
 
-    public void setMovie(Movies movie) {
+    public void setMovie(Movie movie) {
         this.movie = movie;
     }
 
@@ -68,7 +68,7 @@ public class Rent {
         return Objects.equals(this.id, other.id);
     }
 
-    public Rent(Long id, String name, Movies movie, LocalDateTime date) {
+    public Rent(Long id, String name, Movie movie, LocalDateTime date) {
         this.id = id;
         this.name = name;
         this.movie = movie;
