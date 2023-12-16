@@ -15,7 +15,7 @@ public class Rent {
     private Movie movie;
     private LocalDateTime date;
 
-    public String getNome() {
+    public String getName() {
         return name;
     }
 
