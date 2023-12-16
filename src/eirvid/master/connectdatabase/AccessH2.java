@@ -1,11 +1,15 @@
 package eirvid.master.connectdatabase;
 
+import eirvid.master.model.Movie;
+import eirvid.master.model.Rent;
 import eirvid.master.model.UserEirVid;
 import java.sql.Statement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -16,9 +20,11 @@ import java.sql.SQLException;
 
 public class AccessH2 {
 
+    // Method to create a tables of system
     public void createTables() {
         
-        // Creating all tables in the H2 database in memory
+        
+        //Creating all tables in H2 database in memory
         ConnectToDataBase connectToDataBase = new ConnectToDataBase();
         Connection connection = connectToDataBase.getConnection();
         
@@ -26,13 +32,38 @@ public class AccessH2 {
         try (connection) {
             connection.setAutoCommit(false);
             stmt = connection.createStatement();
+            
             // Create a UserEirVid table 
-            stmt.execute("CREATE TABLE IF NOT EXISTS USEREIRVID(id IDENTITY NOT NULL PRIMARY KEY, emailUser VARCHAR(200), nameUser VARCHAR(150), passwordUser VARCHAR(50))");
-            stmt.execute("INSERT INTO USEREIRVID(emailUser, nameUser, passwordUser) VALUES('angelita@gmail.com', 'Angelita', '123456')");
+            
+            stmt.execute("CREATE TABLE IF NOT EXISTS USEREIRVID (" + 
+                "id IDENTITY NOT NULL PRIMARY KEY, " +
+                "emailUser VARCHAR(200), " + 
+                "nameUser VARCHAR(150), " + 
+                "passwordUser VARCHAR(50))"
+            );
 
-            // Create a Movie table 
-            stmt.execute("CREATE TABLE IF NOT EXISTS MOVIE(id IDENTITY NOT NULL PRIMARY KEY, nameMovie VARCHAR(200), categoryMovie VARCHAR(150), yearMovie VARCHAR(4), price VARCHAR(6))");
+            stmt.execute("CREATE TABLE IF NOT EXISTS MOVIE (" + 
+                "id IDENTITY NOT NULL PRIMARY KEY, " + 
+                "nameMovie VARCHAR(200), " + 
+                "categoryMovie VARCHAR(150), " +  
+                "yearMovie VARCHAR(4), " + 
+                "price VARCHAR(6))"
+            );
 
+            stmt.execute("CREATE TABLE IF NOT EXISTS RENT (" +
+                "id IDENTITY NOT NULL PRIMARY KEY, " +
+                "nameRent INT NOT NULL, " +
+                "movieRent INT NOT NULL, " +
+                "dateRent VARCHAR(19), " +
+                "FOREIGN KEY(id) " +
+                "REFERENCES RENT (id), " +
+                "FOREIGN KEY(id) " +
+                "REFERENCES RENT (id))"
+            );
+            
+            stmt.execute("INSERT INTO USEREIRVID(emailUser, nameUser, passwordUser) VALUES('jeff@gmail.com', 'Jeff', '123456')");
+            stmt.execute("INSERT INTO RENT(nameRent, movieRent, dateRent) VALUES(1, 1, '2023-12-10 12:34:00')");
+//            stmt.execute("INSERT INTO MOVIE(nameMovie, categoryMovie, yearMovie, price) VALUES('Matrix', 'Sifi', '1999', '5.00')");
             
             stmt.close();
             connection.commit();
@@ -65,6 +96,27 @@ public class AccessH2 {
             System.out.println("Exception Message " + e.getLocalizedMessage());
         } finally {
             connectToDataBase.closeConnection(connection, createPreparedStatement, null);
+        }
+    }
+    
+    // Insert a movie and an user in the RENT table
+    public void insertMovieAndUserInRentSql(Long nameRent, Long movieRent, String dateRent, String insertMovieAndUserInRentSql) {
+                
+        ConnectToDataBase connectToDataBase = new ConnectToDataBase();
+        Connection connection = connectToDataBase.getConnection();
+
+        PreparedStatement pstm = null;
+        try {
+            pstm = connection.prepareStatement(insertMovieAndUserInRentSql);
+            pstm.setLong(1, nameRent);
+            pstm.setLong(2, movieRent);
+            pstm.setString(3, dateRent);
+
+            pstm.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+             connectToDataBase.closeConnection(connection, null, null);
         }
     }
     
@@ -162,6 +214,75 @@ public class AccessH2 {
         }
     }
 
+    public List<RentDto> showLastFiveRentals() {
+        
+        ConnectToDataBase connectToDataBase = new ConnectToDataBase();
+        Connection connection = connectToDataBase.getConnection();
+        
+        PreparedStatement selectPreparedStatement = null;
+
+        List<RentDto> renteds = new ArrayList<>();
+        ResultSet rs = null;
+        
+        String selectQuery = "SELECT movieRent.NAMEMOVIE, movieRent.CATEGORYMOVIE, movieRent.YEARMOVIE from RENT " +
+                             "JOIN USEREIRVID userRent " +
+                             "ON RENT.ID = userRent.ID " +
+                             "JOIN MOVIE movieRent " +
+                             "ON userRent.ID = movieRent " +
+                             "ORDER BY userRent.ID DESC LIMIT 5";
+        
+        RentDto rentDto = null;
+        try {
+            selectPreparedStatement = connection.prepareStatement(selectQuery);
+            rs = selectPreparedStatement.executeQuery();
+            while (rs.next()) {
+                rentDto = new RentDto();
+                rentDto.setNameMovie(rs.getString("nameMovie"));
+                rentDto.setCategoryMovie("categoryMovie");
+                rentDto.setYearMovie(rs.getString("yearMovie"));
+
+                renteds.add(rentDto);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            connectToDataBase.closeConnection(connection, selectPreparedStatement, rs);
+        }
+        return renteds;
+    }
+    
+    public List<Rent> findAllRent() {
+        
+        ConnectToDataBase connectToDataBase = new ConnectToDataBase();
+        Connection connection = connectToDataBase.getConnection();
+        
+        PreparedStatement selectPreparedStatement = null;
+
+        List<Rent> renteds = new ArrayList<>();
+        ResultSet rs = null;
+        String selectQuery = "SELECT * FROM RENT";
+        
+        Rent rent = null;
+        try {
+            selectPreparedStatement = connection.prepareStatement(selectQuery);
+            rs = selectPreparedStatement.executeQuery();
+            while (rs.next()) {
+                rent = new Rent();
+                rent.setId(rs.getLong("id"));
+                rent.setMovieRent(rs.getLong("movieRent"));
+                rent.setNameRent(rs.getLong("userRent"));
+                rent.setdateRent(rs.getString("dateRent"));
+
+                renteds.add(rent);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            connectToDataBase.closeConnection(connection, selectPreparedStatement, rs);
+        }
+        return renteds;
+    }
+    
     // Get the data of Movie using an id
     public Movie findMovieById(Long idMovie) {
                 
@@ -192,7 +313,6 @@ public class AccessH2 {
             System.out.println("Exception Message " + e.getLocalizedMessage());
         } catch (Exception e) {
         } finally {
-            System.out.println("Database Selected");
             connectToDataBase.closeConnection(connection, selectPreparedStatement, rs);
             return movie;
         }
@@ -227,14 +347,13 @@ public class AccessH2 {
             System.out.println("Exception Message " + e.getLocalizedMessage());
         } catch (Exception e) {
         } finally {
-            System.out.println("Database Selected");
             connectToDataBase.closeConnection(connection, selectPreparedStatement, rs);
-            return user;
         }
+        return user;
     }
     
     // Verify if the user exist in a database
-    public boolean checkIfUserExists(String email, String password) {
+    public Long checkIfUserExists(String email, String password) {
                 
         ConnectToDataBase connectToDataBase = new ConnectToDataBase();
         Connection connection = connectToDataBase.getConnection();
@@ -242,9 +361,10 @@ public class AccessH2 {
         PreparedStatement selectPreparedStatement = null;
 
 //        UserEirVid user = new UserEirVid();
-        boolean userFound = false;
+//        boolean userFound = false;
+        UserEirVid user = new UserEirVid();
         ResultSet rs = null;
-//        String sql = "SELECT * FROM UserEirVid WHERE EMAIL = ? AND PASSWORD = ?";
+
         String SelectQuery = "SELECT * FROM USEREIRVID WHERE EMAILUSER = ? AND PASSWORDUSER = ?";
 
         try (connection) {
@@ -256,15 +376,15 @@ public class AccessH2 {
             
             rs = selectPreparedStatement.executeQuery();
             if(rs.next()) {
-                userFound = true;
+                user.setId(rs.getLong("id"));
+//                userFound = true;
             }
         } catch (SQLException e) {
             System.out.println("Exception Message " + e.getLocalizedMessage());
         } catch (Exception e) {
         } finally {
-            System.out.println("Database Selected");
             connectToDataBase.closeConnection(connection, selectPreparedStatement, rs);
-            return userFound;
         }
+        return user.getId();
     }
 }
