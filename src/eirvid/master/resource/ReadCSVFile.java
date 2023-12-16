@@ -27,7 +27,7 @@ public class ReadCSVFile {
         Reader reader;
         try {
             reader = Files.newBufferedReader
-                (Paths.get("C:\\Users\\Evandro\\Documents\\NetBeansProjects\\EirVid\\src\\eirvid\\master\\resource\\Filmes.csv"));
+                (Paths.get("C:\\Users\\victo\\OneDrive\\Documents\\NetBeansProjects\\EirVid\\src\\eirvid\\master\\resource\\MoviesEirVid.csv"));
             CSVReader csvReader = new CSVReaderBuilder(reader).withSkipLines(1).build();
             moviesFile = csvReader.readAll();
         } catch (IOException ex) {
