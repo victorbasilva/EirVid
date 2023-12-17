@@ -10,36 +10,36 @@ import java.util.Objects;
 
 public class UserEirVid {
 
-    public UserEirVid() {
+   public UserEirVid() {
     }
 
     private Long id;
-    private String name;
-    private String email;
-    private String password;
+    private String nameUser;
+    private String emailUser;
+    private String passwordUser;
 
-    public String getName() {
-        return name;
+    public String getNameUser() {
+        return nameUser;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setNameUser(String nameUser) {
+        this.nameUser = nameUser;
     }
 
-    public String getEmail() {
-        return email;
+    public String getEmailUser() {
+        return emailUser;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setEmailUser(String emailUser) {
+        this.emailUser = emailUser;
     }
 
-    public String getPassword() {
-        return password;
+    public String getPasswordUser() {
+        return passwordUser;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setPasswordUser(String passwordUser) {
+        this.passwordUser = passwordUser;
     }
 
     public Long getId() {
@@ -72,35 +72,10 @@ public class UserEirVid {
         return Objects.equals(this.id, other.id);
     }
 
-    public UserEirVid(Long id, String name, String email, String password) {
+    public UserEirVid(Long id, String nameUser, String emailUser, String passwordUser) {
         this.id = id;
-        this.name = name;
-        this.email = email;
-        this.password = password;
+        this.nameUser = nameUser;
+        this.emailUser = emailUser;
+        this.passwordUser = passwordUser;
     }
-
-    public void setEmailUser(String string) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public void setNameUser(String string) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public void setPasswordUser(String string) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public String getNameUser() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public String getEmailUser() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public String getPasswordUser() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
 }
