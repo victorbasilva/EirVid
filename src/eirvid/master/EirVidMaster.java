@@ -35,7 +35,7 @@ public class EirVidMaster {
         
         do {
             displayMenu();
-            System.out.print("Enter your choice (1-4, 5 to exit): ");
+            System.out.print("Enter your choice (1-5, 6 to exit): ");
             
             while (!scanner.hasNextInt()) {
                 System.out.println("Invalid input. Please enter a number.");
