@@ -45,7 +45,7 @@ Some parts of the application may require configuration. Here's what you need to
 - **CSV File Path**: Update the CSV file path in `ReadCSVFile.java` to where you have stored the `MoviesEirVid.csv` file locally.
 
 ## Latest Release
-You can download the latest release of the ÉirVid Movie Rental System from [here]([ÉirVid V1.0.0](https://github.com/victorbasilva/EirVid/releases).
+You can download the latest release of the ÉirVid Movie Rental System from ([ÉirVid V1.0.0](https://github.com/victorbasilva/EirVid/releases).
 
 ## Video Demonstration
 For a detailed walkthrough and demonstration of the ÉirVid Movie Rental System, please view our video demo at [this link](https://www.yourvideodemonstrationlink.com).
