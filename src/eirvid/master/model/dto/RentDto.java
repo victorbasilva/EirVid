@@ -2,7 +2,8 @@ package eirvid.master.model.dto;
 
 /**
  *
- * @author Victor
+ * Studant Name: Joelma Rodrigues
+ * Student No:   2023246
  */
 public class RentDto {  
 
