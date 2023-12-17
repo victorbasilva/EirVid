@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /*
-*Student Name: Joelma Rodrigues
-*Student ID: 2023246
+*Student Name:Joelma Rodrigues
+*Student ID:  2023246
 */
 
 public class UserLoad {
@@ -20,10 +20,6 @@ public class UserLoad {
         // Instances of user
         UserEirVid user1 = new UserEirVid();
         UserEirVid user2 = new UserEirVid();
-//        User user3 = new User();
-//        User user4 = new User();
-//        User user5 = new User();
-//        User user6 = new User();
 
         // Populating the user instances
         user1.setId(1L);
