@@ -39,9 +39,11 @@ public class EirVidMaster {
             
             while (!scanner.hasNextInt()) {
                 System.out.println("Invalid input. Please enter a number.");
+                System.out.println("");
                 scanner.next();
             }
             choice = scanner.nextInt();
+            System.out.println("");
             
             switch (choice) {
                 case 1 -> {
@@ -69,7 +71,7 @@ public class EirVidMaster {
                     showMoviesToday(accessH2);
                 }
                 case 5 -> {
-                    System.out.println("--- 5 --- Show the last 5 rentals");
+                    System.out.println("--- 5 --- Show 5 most rented movies");
                     showLastFiveRentals(accessH2);
                 }
                 case 6 -> {
@@ -83,19 +85,23 @@ public class EirVidMaster {
 
     //Show a screen menu for the user
     private static void displayMenu() {
+        
         System.out.println("=== Console Menu ===");
-
+        
+        System.out.println("");
         System.out.println("1 - Login");
         System.out.println("2 - Rent your movie");
         System.out.println("3 - Create your user");
         System.out.println("4 - My movie rentals today");
         System.out.println("5 - Show the last 5 rentals");
         System.out.println("6 - Logout");
+        System.out.println("");
 
         System.out.println("====================");
+        System.out.println("");
     }
     
-    //Fininsh the applicattion
+    //Finish the applicattion
     private static void finish() {
         
         System.out.println("Logout of Application");
@@ -129,9 +135,11 @@ public class EirVidMaster {
         userFound = accessH2.checkIfUserExists( email, password);
         if (userFound != null) {
             System.out.println("User and password Correct.");
+            System.out.println("");
         } else {
             userFound = 0L;
             System.out.println("User and password Incorrect.");
+            System.out.println("");
         }
         return userFound;
     }
@@ -154,10 +162,13 @@ public class EirVidMaster {
             System.out.print(" - Year: " + movie.getYearMovie());
             System.out.println(" - Price: " + movie.getPrice());
         }
-
-        System.out.println("Choose your movie.");
-        System.out.println("1 - Choose your movie");
-        System.out.println("2 - Back");
+        
+        System.out.println("");
+        System.out.println("Pick your choice below.");
+        System.out.println("");
+        System.out.println("1 - Choose your movie from the list above");
+        System.out.println("2 - Back to Menu");
+        System.out.println("");
 
         while (!sc.hasNextLong()) {
             System.out.println("Invalid input. Please enter a number.");
@@ -183,6 +194,7 @@ public class EirVidMaster {
                 System.out.println(" - Price: " + movie.getPrice());
 
                 System.out.println( "###################################### RENT ###############################################");
+                System.out.println("");
 
                 String insertSqlMovie = "INSERT INTO RENT(userRent, movieRent, dateRent) VALUES(?, ?, ?)";
 
@@ -193,6 +205,7 @@ public class EirVidMaster {
                 accessH2.insertMovieAndUserInRentSql(userId, movieRented, formatDateTime, insertSqlMovie);
                 
                 System.out.println("Movie rented.");
+                System.out.println("");
             } else if (search == 2) {
         }
     }
@@ -211,7 +224,7 @@ public class EirVidMaster {
         Scanner sc = new Scanner(System.in);
 
         System.out.println("1 - Create your user");
-        System.out.println("2 - Back");
+        System.out.println("2 - Back to Menu");
 //        start = sc.nextInt();  // Read user input
         while (!sc.hasNextInt()) {
             System.out.println("Invalid input. Please enter a number.");
@@ -237,6 +250,7 @@ public class EirVidMaster {
         UserEirVid createdUser = accessH2.findUserById(2L);
 
         System.out.println("User " + createdUser.getNameUser() + " created.");
+        System.out.println("");
     }
 
     //5 last movies rented 
@@ -250,9 +264,11 @@ public class EirVidMaster {
                 System.out.print(" - Name: " + rent.getNameMovie());
                 System.out.print(" - Category: " + rent.getCategoryMovie());
                 System.out.println(" - Year: " + rent.getYearMovie());
+                System.out.println("");
             }
         } else {
-            System.out.println("There is no movie rented yet.");              
+            System.out.println("There is no movie rented yet.");
+            System.out.println("");
         }
     }
     
@@ -265,9 +281,11 @@ public class EirVidMaster {
                 System.out.print(" - Name: " + rent.getNameMovie());
                 System.out.print(" - Category: " + rent.getCategoryMovie());
                 System.out.println(" - Year: " + rent.getYearMovie());
+                System.out.println("");
             }
         } else {
             System.out.println("There is no movie rented yet.");
+            System.out.println("");
         }
     }  
 }
