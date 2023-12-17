@@ -81,6 +81,7 @@ public class UserEirVid {
 
     public void setEmailUser(String string) {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
 
     public void setNameUser(String string) {
         throw new UnsupportedOperationException("Not supported yet.");
