@@ -5,11 +5,10 @@ import eirvid.master.model.Movie;
 import eirvid.master.model.UserEirVid;
 import eirvid.master.model.dto.RentDto;
 import eirvid.master.resource.ReadCSVFile;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 /*
  * @author victor
  * student number: 2021259
@@ -30,8 +29,6 @@ public class EirVidMaster {
         int choice;
         Long userLoged = 0L;
         UserEirVid user = new UserEirVid();
-        List<Movie> movies = new ArrayList<>();
-        List<RentDto> movieRented = new ArrayList<>();
 
         //Enter into the screen menu
         Scanner scanner = new Scanner(System.in);
@@ -48,41 +45,42 @@ public class EirVidMaster {
             
             switch (choice) {
                 case 1 -> {
-                    System.out.println("1 - Login");
+                    System.out.println("--- 1 --- Login");
                     userLoged = login(accessH2);
-                    if (userLoged != null && userLoged > 0) {
+
+                    if (userLoged > 0) {
                         user = findUserBy(accessH2, userLoged);
                     }
                 }
                 case 2 -> {
-                    System.out.println("2 - Rent your movie");
-                    if (userLoged != null && userLoged > 0) {
-                        movies = choiceMovie(user.getId(), csv, accessH2);
+                    System.out.println("--- 2 --- Rent your movie");
+                    if (userLoged > 0) {
+                        choiceMovie(user.getId(), csv, accessH2);
                     } else {
                         System.out.println("Please, enter your login");
                     }
                 }
                 case 3 -> {
-                    if (userLoged == null || userLoged == 0) {
-                        System.out.println("Exit to create a new user.");
-                    } else {
-                        System.out.println("3 - Create your user");
+                        System.out.println("--- 3 --- Create a new user");
                         createUser(accessH2);
-                    }
                 }
                 case 4 -> {
-                    System.out.println("4 - Show the last 5 rentals");
-                    movieRented = showLastFiveRentals(accessH2);
+                    System.out.println("--- 4 --- My movie rentals today");
+                    showMoviesToday(accessH2);
                 }
                 case 5 -> {
-                    System.out.println("4 - Exiting the program. Goodbye!");
+                    System.out.println("--- 5 --- Show the last 5 rentals");
+                    showLastFiveRentals(accessH2);
+                }
+                case 6 -> {
+                    System.out.println("--- 6 --- Exiting the program. Goodbye!");
                     finish();
                 }
             }
-        } while (choice != 5);
+        } while (choice != 6);
         scanner.close();
     }
-    
+
     //Show a screen menu for the user
     private static void displayMenu() {
         System.out.println("=== Console Menu ===");
@@ -90,12 +88,14 @@ public class EirVidMaster {
         System.out.println("1 - Login");
         System.out.println("2 - Rent your movie");
         System.out.println("3 - Create your user");
-        System.out.println("4 - Show the last 5 rentals");
-        System.out.println("5 - Logout");
+        System.out.println("4 - My movie rentals today");
+        System.out.println("5 - Show the last 5 rentals");
+        System.out.println("6 - Logout");
 
         System.out.println("====================");
     }
-
+    
+    //Fininsh the applicattion
     private static void finish() {
         
         System.out.println("Logout of Application");
@@ -114,7 +114,7 @@ public class EirVidMaster {
         String password;
         Scanner emailUser;
         Scanner passwordUser;
-        Long userFound = 0L;
+        Long userFound;
         
         System.out.println("Access the System");
 
@@ -130,18 +130,20 @@ public class EirVidMaster {
         if (userFound != null) {
             System.out.println("User and password Correct.");
         } else {
+            userFound = 0L;
             System.out.println("User and password Incorrect.");
         }
         return userFound;
     }
     
     //Chosed movies database storage
-    private static List<Movie> choiceMovie(Long userId, ReadCSVFile csv, AccessH2 accessH2) {
+    private static void choiceMovie(Long userId, ReadCSVFile csv, AccessH2 accessH2) {
         
+        Scanner sc = new Scanner(System.in);
+
         Long search;
         Long movieRented;
         
-        Scanner sc = new Scanner(System.in);
         List<Movie> movies;
         movies = csv.listMovies();
         
@@ -154,13 +156,23 @@ public class EirVidMaster {
         }
 
         System.out.println("Choose your movie.");
-        System.out.println("1 - Search the movies");
+        System.out.println("1 - Choose your movie");
         System.out.println("2 - Back");
-        search = sc.nextLong();  // Read user input
+
+        while (!sc.hasNextLong()) {
+            System.out.println("Invalid input. Please enter a number.");
+            sc.next();
+            }
+        search = sc.nextLong();
 
         if (search == 1) {
-                System.out.println("Type Id to choice your Movie.");
-                search = sc.nextLong();  // Read user input
+                System.out.println("Type Id to choose your Movie.");
+                while (!sc.hasNextLong()) {
+                    System.out.println("Invalid input. Please enter a number.");
+                    sc.next();
+                    }
+                search = sc.nextLong();
+                
                 Movie movie = accessH2.findMovieById(search);
                 movieRented = movie.getId();
 
@@ -172,20 +184,17 @@ public class EirVidMaster {
 
                 System.out.println( "###################################### RENT ###############################################");
 
-                String insertSqlMovie = "INSERT INTO RENT(nameRent, movieRent, dateRent) VALUES(?, ?, ?)";
+                String insertSqlMovie = "INSERT INTO RENT(userRent, movieRent, dateRent) VALUES(?, ?, ?)";
 
                 LocalDateTime date = LocalDateTime.now();
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
                 String formatDateTime = date.format(formatter);
 
                 accessH2.insertMovieAndUserInRentSql(userId, movieRented, formatDateTime, insertSqlMovie);
-
-                movies.add(movie);
+                
                 System.out.println("Movie rented.");
             } else if (search == 2) {
-        return null;              
         }
-        return movies;
     }
     
     //New user creation
@@ -202,13 +211,13 @@ public class EirVidMaster {
         Scanner sc = new Scanner(System.in);
 
         System.out.println("1 - Create your user");
-        System.out.println("2 - Finish");
-        start = sc.nextInt();  // Read user input
-
-        if (start == 2) {
-            System.out.println("Logout of Application");
-            System.exit(0); 
-        }
+        System.out.println("2 - Back");
+//        start = sc.nextInt();  // Read user input
+        while (!sc.hasNextInt()) {
+            System.out.println("Invalid input. Please enter a number.");
+            sc.next();
+            }
+        start = sc.nextInt();
 
         nameUser = new Scanner(System.in);
         System.out.println("Enter your name");
@@ -227,30 +236,38 @@ public class EirVidMaster {
 
         UserEirVid createdUser = accessH2.findUserById(2L);
 
-        System.out.print("Id: " + createdUser.getId());
-        System.out.print(" - Name: " + createdUser.getNameUser());
-        System.out.print(" - Email: " + createdUser.getEmailUser());
-        System.out.println(" - Password: " + createdUser.getPasswordUser());
-        System.out.println();
-        System.out.print("User created with success.");
+        System.out.println("User " + createdUser.getNameUser() + " created.");
+    }
+
+    //5 last movies rented 
+    private static void showLastFiveRentals(AccessH2 accessH2) {
+        
+        List<RentDto> rentals = accessH2.showLastFiveRentals();
+
+        if (!rentals.isEmpty()) {
+            for (RentDto rent : rentals) {
+                System.out.print(" - Id: " + rent.getId());
+                System.out.print(" - Name: " + rent.getNameMovie());
+                System.out.print(" - Category: " + rent.getCategoryMovie());
+                System.out.println(" - Year: " + rent.getYearMovie());
+            }
+        } else {
+            System.out.println("There is no movie rented yet.");              
+        }
     }
     
-    //5 last movies rented 
-    private static List<RentDto> showLastFiveRentals(AccessH2 accessH2) {
+    private static void showMoviesToday(AccessH2 accessH2) {
         
-        List<RentDto> rentals = new ArrayList<>();
-        
-        if (rentals.isEmpty()) {
-            rentals = accessH2.showLastFiveRentals();
+        List<RentDto> rentals = accessH2.showMoviesToday();
+            
+        if (!rentals.isEmpty()) {
+            for (RentDto rent : rentals) {
+                System.out.print(" - Name: " + rent.getNameMovie());
+                System.out.print(" - Category: " + rent.getCategoryMovie());
+                System.out.println(" - Year: " + rent.getYearMovie());
+            }
         } else {
-            System.out.print("There is no movie rented yet.");              
+            System.out.println("There is no movie rented yet.");
         }
-
-        for (RentDto rent : rentals) {
-            System.out.print(" - Name: " + rent.getNameMovie());
-            System.out.print(" - Category: " + rent.getCategoryMovie());
-            System.out.println(" - Year: " + rent.getYearMovie());
-        }
-        return rentals;
     }  
 }
