@@ -24,7 +24,6 @@ public class AccessH2 {
     // Method to create a tables of system
     public void createTables() {
         
-        
         //Creating all tables in H2 database in memory
         ConnectToDataBase connectToDataBase = new ConnectToDataBase();
         Connection connection = connectToDataBase.getConnection();
@@ -53,22 +52,19 @@ public class AccessH2 {
 
             stmt.execute("CREATE TABLE IF NOT EXISTS RENT (" +
                 "id IDENTITY NOT NULL PRIMARY KEY, " +
-                "nameRent INT NOT NULL, " +
+                "userRent INT NOT NULL, " +
                 "movieRent INT NOT NULL, " +
                 "dateRent VARCHAR(19), " +
-                "FOREIGN KEY(id) " +
-                "REFERENCES RENT (id), " +
-                "FOREIGN KEY(id) " +
-                "REFERENCES RENT (id))"
+                "FOREIGN KEY(userRent) " +
+                "REFERENCES USEREIRVID (id), " +
+                "FOREIGN KEY(movieRent) " +
+                "REFERENCES MOVIE (id))"
             );
             
             stmt.execute("INSERT INTO USEREIRVID(emailUser, nameUser, passwordUser) VALUES('jeff@gmail.com', 'Jeff', '123456')");
-            stmt.execute("INSERT INTO RENT(nameRent, movieRent, dateRent) VALUES(1, 1, '2023-12-10 12:34:00')");
-//            stmt.execute("INSERT INTO MOVIE(nameMovie, categoryMovie, yearMovie, price) VALUES('Matrix', 'Sifi', '1999', '5.00')");
             
             stmt.close();
             connection.commit();
-            System.out.println("Databases Created");
         } catch (SQLException e) {
             System.out.println("Exception Message " + e.getLocalizedMessage());
         } catch (Exception e) {
@@ -100,8 +96,8 @@ public class AccessH2 {
         }
     }
     
-    // Insert a movie and an user in the RENT table
-    public void insertMovieAndUserInRentSql(Long nameRent, Long movieRent, String dateRent, String insertMovieAndUserInRentSql) {
+    // Insert a movie and an user into the RENT table
+    public void insertMovieAndUserInRentSql(Long userRent, Long movieRent, String dateRent, String insertMovieAndUserInRentSql) {
                 
         ConnectToDataBase connectToDataBase = new ConnectToDataBase();
         Connection connection = connectToDataBase.getConnection();
@@ -109,11 +105,11 @@ public class AccessH2 {
         PreparedStatement pstm = null;
         try {
             pstm = connection.prepareStatement(insertMovieAndUserInRentSql);
-            pstm.setLong(1, nameRent);
+            pstm.setLong(1, userRent);
             pstm.setLong(2, movieRent);
             pstm.setString(3, dateRent);
 
-            pstm.executeUpdate();
+            pstm.execute();
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -215,6 +211,43 @@ public class AccessH2 {
         }
     }
 
+    public List<RentDto> showMoviesToday() {
+        
+        ConnectToDataBase connectToDataBase = new ConnectToDataBase();
+        Connection connection = connectToDataBase.getConnection();
+        
+        PreparedStatement selectPreparedStatement = null;
+
+        List<RentDto> renteds = new ArrayList<>();
+        ResultSet rs = null;
+
+        String selectQuery = "SELECT movieRent.ID, movieRent.NAMEMOVIE, movieRent.CATEGORYMOVIE, movieRent.YEARMOVIE, FROM RENT " +
+                             "JOIN USEREIRVID userRent " +
+                             "ON rent.USERRENT = userRent.ID " +
+                             "JOIN MOVIE movieRent " +
+                             "ON rent.MOVIERENT = movieRent.ID ";
+         
+        RentDto rentDto;
+        try {
+            selectPreparedStatement = connection.prepareStatement(selectQuery);
+            rs = selectPreparedStatement.executeQuery();
+            while (rs.next()) {
+                rentDto = new RentDto();
+                rentDto.setId(rs.getString("id"));
+                rentDto.setNameMovie(rs.getString("nameMovie"));
+                rentDto.setCategoryMovie(rs.getString("categoryMovie"));
+                rentDto.setYearMovie(rs.getString("yearMovie"));
+
+                renteds.add(rentDto);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            connectToDataBase.closeConnection(connection, selectPreparedStatement, rs);
+        }
+        return renteds;
+    }
+    
     public List<RentDto> showLastFiveRentals() {
         
         ConnectToDataBase connectToDataBase = new ConnectToDataBase();
@@ -225,19 +258,20 @@ public class AccessH2 {
         List<RentDto> renteds = new ArrayList<>();
         ResultSet rs = null;
         
-        String selectQuery = "SELECT movieRent.NAMEMOVIE, movieRent.CATEGORYMOVIE, movieRent.YEARMOVIE from RENT " +
+        String selectQuery = "SELECT movieRent.ID, movieRent.NAMEMOVIE, movieRent.CATEGORYMOVIE, movieRent.YEARMOVIE, FROM RENT " +
                              "JOIN USEREIRVID userRent " +
-                             "ON RENT.ID = userRent.ID " +
+                             "ON rent.USERRENT = userRent.ID " +
                              "JOIN MOVIE movieRent " +
-                             "ON userRent.ID = movieRent " +
-                             "ORDER BY userRent.ID DESC LIMIT 5";
-        
-        RentDto rentDto = null;
+                             "ON rent.MOVIERENT = movieRent.ID " +
+                             "ORDER BY rent.ID DESC LIMIT 5";
+         
+        RentDto rentDto;
         try {
             selectPreparedStatement = connection.prepareStatement(selectQuery);
             rs = selectPreparedStatement.executeQuery();
             while (rs.next()) {
                 rentDto = new RentDto();
+                rentDto.setId(rs.getString("id"));
                 rentDto.setNameMovie(rs.getString("nameMovie"));
                 rentDto.setCategoryMovie("categoryMovie");
                 rentDto.setYearMovie(rs.getString("yearMovie"));
@@ -361,8 +395,6 @@ public class AccessH2 {
         
         PreparedStatement selectPreparedStatement = null;
 
-//        UserEirVid user = new UserEirVid();
-//        boolean userFound = false;
         UserEirVid user = new UserEirVid();
         ResultSet rs = null;
 
@@ -378,7 +410,6 @@ public class AccessH2 {
             rs = selectPreparedStatement.executeQuery();
             if(rs.next()) {
                 user.setId(rs.getLong("id"));
-//                userFound = true;
             }
         } catch (SQLException e) {
             System.out.println("Exception Message " + e.getLocalizedMessage());
